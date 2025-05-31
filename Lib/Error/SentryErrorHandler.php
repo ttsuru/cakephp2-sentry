@@ -7,6 +7,11 @@ App::uses('ErrorHandler', 'Error');
 class SentryErrorHandler extends ErrorHandler
 {
     /**
+     * @var bool  Tracks if Sentry has been initialized
+     */
+    private static $initialized = false;
+
+    /**
      * List of exception classes that should not be reported to Sentry.
      *
      * @var array
@@ -18,6 +23,10 @@ class SentryErrorHandler extends ErrorHandler
      */
     public static function init()
     {
+        if (self::$initialized) {
+            return;
+        }
+
         // Fetch DSN and other options from Configure
         $dsn = Configure::read('Sentry.dsn');
         $options = (array) Configure::read('Sentry.options', []);
@@ -32,6 +41,8 @@ class SentryErrorHandler extends ErrorHandler
 
         // Register shutdown handler to catch fatal errors
         register_shutdown_function([__CLASS__, 'handleShutdown']);
+
+        self::$initialized = true;
     }
 
     /**
@@ -39,6 +50,8 @@ class SentryErrorHandler extends ErrorHandler
      */
     public static function handleError($code, $description, $file = null, $line = null, $context = null): bool
     {
+        self::init();
+
         // Delegate to CakePHP for logging/display
         parent::handleError($code, $description, $file, $line, $context);
 
@@ -59,6 +72,8 @@ class SentryErrorHandler extends ErrorHandler
      */
     public static function handleException($exception): void
     {
+        self::init();
+
         // Delegate to CakePHP
         parent::handleException($exception);
 
@@ -76,6 +91,8 @@ class SentryErrorHandler extends ErrorHandler
      */
     public static function handleShutdown(): void
     {
+        self::init();
+
         $error = error_get_last();
         if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
             $exception = new ErrorException(
