@@ -17,6 +17,7 @@
             MissingActionException::class,
         ]
     ]);
+    App::uses('SentryErrorHandler', 'Sentry.Lib/Error');
 ```
 
 ```php
