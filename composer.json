@@ -1,0 +1,17 @@
+{
+    "name": "cakephp2-plugin/sentry",
+    "type": "cakephp-plugin",
+    "license": "MIT",
+    "require": {
+        "php": "^8.0",
+        "cakephp/cakephp": "^2.10",
+        "composer/installers": "*",
+        "sentry/sentry": "^4.11"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "installer-name": "Sentry"
+    }
+}
